@@ -1,0 +1,363 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Middleware Rates and Label">
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+    <stringProp name="TestPlan.comments">Sanitised performance test plan (no hosts, paths, keys or real data inside).
+
+Everything environment-specific is read through JMeter properties (the __P function):
+  host_customer / host_admin / host_mw, scheme, port, path_*, zpl_api_key, ...
+  threads, rampup, duration, loops, think_time_ms, think_time_range_ms
+Defaults point at the bundled mock API. Real values live in private/config.properties
+(git-ignored). See README.md and config/example.properties.</stringProp></TestPlan>
+    <hashTree>
+      <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config - Accounts">
+        <stringProp name="delimiter">,</stringProp>
+        <stringProp name="fileEncoding"/>
+        <stringProp name="filename">${__P(data_dir,../data/sample)}/accounts.csv</stringProp>
+        <boolProp name="ignoreFirstLine">true</boolProp>
+        <boolProp name="quotedData">false</boolProp>
+        <boolProp name="recycle">true</boolProp>
+        <stringProp name="shareMode">shareMode.all</stringProp>
+        <boolProp name="stopThread">false</boolProp>
+        <stringProp name="variableNames">account,apikey</stringProp>
+      </CSVDataSet>
+      <hashTree/>
+      <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config - FSA-SD,ND" enabled="true">
+        <stringProp name="filename">${__P(data_dir,../data/sample)}/fsa_sdnd.csv</stringProp>
+        <stringProp name="fileEncoding"/>
+        <stringProp name="variableNames">from_sdnd,to_sdnd</stringProp>
+        <boolProp name="ignoreFirstLine">true</boolProp>
+        <stringProp name="delimiter">,</stringProp>
+        <boolProp name="quotedData">false</boolProp>
+        <boolProp name="recycle">true</boolProp>
+        <boolProp name="stopThread">false</boolProp>
+        <stringProp name="shareMode">shareMode.all</stringProp>
+      </CSVDataSet>
+      <hashTree/>
+      <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config-FSA-STD" enabled="true">
+        <stringProp name="filename">${__P(data_dir,../data/sample)}/fsa_std.csv</stringProp>
+        <stringProp name="fileEncoding"/>
+        <stringProp name="variableNames">from_std,to_std</stringProp>
+        <boolProp name="ignoreFirstLine">true</boolProp>
+        <stringProp name="delimiter">,</stringProp>
+        <boolProp name="quotedData">false</boolProp>
+        <boolProp name="recycle">true</boolProp>
+        <boolProp name="stopThread">false</boolProp>
+        <stringProp name="shareMode">shareMode.all</stringProp>
+      </CSVDataSet>
+      <hashTree/>
+      <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config-SL" enabled="true">
+        <stringProp name="filename">${__P(data_dir,../data/sample)}/services.csv</stringProp>
+        <stringProp name="fileEncoding"/>
+        <stringProp name="variableNames">service</stringProp>
+        <boolProp name="ignoreFirstLine">true</boolProp>
+        <stringProp name="delimiter">,</stringProp>
+        <boolProp name="quotedData">false</boolProp>
+        <boolProp name="recycle">true</boolProp>
+        <boolProp name="stopThread">false</boolProp>
+        <stringProp name="shareMode">shareMode.all</stringProp>
+      </CSVDataSet>
+      <hashTree/>
+      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+        <collectionProp name="HeaderManager.headers">
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">Accept</stringProp>
+            <stringProp name="Header.value">*/*</stringProp>
+          </elementProp>
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">Accept-Encoding</stringProp>
+            <stringProp name="Header.value">gzip, deflate, br</stringProp>
+          </elementProp>
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">Connection</stringProp>
+            <stringProp name="Header.value">keep-alive</stringProp>
+          </elementProp>
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">x-account-number</stringProp>
+            <stringProp name="Header.value">${account}</stringProp>
+          </elementProp>
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">x-api-key</stringProp>
+            <stringProp name="Header.value">${apikey}</stringProp>
+          </elementProp>
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">Content-Type</stringProp>
+            <stringProp name="Header.value">application/json</stringProp>
+          </elementProp>
+        </collectionProp>
+      </HeaderManager>
+      <hashTree/>
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults (timeouts)" enabled="true">
+  <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables"><collectionProp name="Arguments.arguments"/></elementProp>
+  <stringProp name="HTTPSampler.connect_timeout">${__P(connect_timeout_ms,10000)}</stringProp>
+  <stringProp name="HTTPSampler.response_timeout">${__P(response_timeout_ms,60000)}</stringProp>
+</ConfigTestElement><hashTree/><ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Users" enabled="true">
+        <stringProp name="ThreadGroup.num_threads">${__P(threads,50)}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${__P(rampup,60)}</stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">false</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp><elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">${__P(loops,1)}</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      <stringProp name="ThreadGroup.duration">${__P(duration,3600)}</stringProp><stringProp name="ThreadGroup.delay">0</stringProp></ThreadGroup>
+      <hashTree>
+        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Think Time (think_time_ms + random up to think_time_range_ms)" enabled="true">
+  <stringProp name="ConstantTimer.delay">${__P(think_time_ms,0)}</stringProp>
+  <stringProp name="RandomTimer.range">${__P(think_time_range_ms,0)}</stringProp>
+</UniformRandomTimer><hashTree/><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="01 Get Rates" enabled="false">
+          <stringProp name="HTTPSampler.domain">${__P(host_mw,localhost)}</stringProp>
+          <stringProp name="HTTPSampler.protocol">${__P(scheme,https)}</stringProp>
+          <stringProp name="HTTPSampler.path">${__P(path_mw_account_prefix)}/${account}${__P(path_mw_rates_suffix)}</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#13;
+    "shipment_cost": {&#13;
+        "service_level_code": "${service}",&#13;
+        "account_number": "${account}",&#13;
+        "additional_service_code": [&#13;
+            "SR"&#13;
+        ],&#13;
+        "ship_from": {&#13;
+            "country": "Canada",&#13;
+            "state_province": "ON", &#13;
+            "fsa_code": "${selected_from_fsa}"&#13;
+        },&#13;
+        "ship_to": {&#13;
+            "country": "Canada",&#13;
+            "state_province": "ON",&#13;
+            "fsa_code": "${selected_to_fsa}"&#13;
+        },&#13;
+        "insurance_provider": "Carrier",&#13;
+        "packages": [&#13;
+            {&#13;
+                "dimension_details": {&#13;
+                    "dimension_unit": "cms",&#13;
+                    "dimensions": {&#13;
+                        "length": 9,&#13;
+                        "width": 1,&#13;
+                        "height": 12&#13;
+                    }&#13;
+                },&#13;
+                "weight_details": {&#13;
+                    "weight_unit": "lbs",&#13;
+                    "weight": 9&#13;
+                },&#13;
+                "insured_value": {&#13;
+                    "amount": 100,&#13;
+                    "currency": "CAD"&#13;
+                }&#13;
+            },&#13;
+            {&#13;
+                "dimension_details": {&#13;
+                    "dimension_unit": "inch",&#13;
+                    "dimensions": {&#13;
+                        "length": 12,&#13;
+                        "width": 9,&#13;
+                        "height": 8&#13;
+                    }&#13;
+                },&#13;
+                "weight_details": {&#13;
+                    "weight_unit": "lb",&#13;
+                    "weight": 13&#13;
+                },&#13;
+                "insured_value": {&#13;
+                    "amount": 1000,&#13;
+                    "currency": "CAD"&#13;
+                }&#13;
+            }&#13;
+        ]&#13;
+    }&#13;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        <stringProp name="HTTPSampler.port">${__P(port,0)}</stringProp></HTTPSamplerProxy>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor" enabled="true">
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"/>
+            <stringProp name="parameters"/>
+            <stringProp name="script">// Picks the FSA pair that matches the service level.
+// STD service uses the "standard" FSA list, everything else the SD/ND list.
+// The STD service code comes from the property std_service_code.
+def stdCode = props.getProperty("std_service_code", "STD")
+def service = vars.get("service")
+String fromFsa
+String toFsa
+if (service != null &amp;&amp; service.equalsIgnoreCase(stdCode)) {
+    fromFsa = vars.get("from_std")
+    toFsa   = vars.get("to_std")
+} else {
+    fromFsa = vars.get("from_sdnd")
+    toFsa   = vars.get("to_sdnd")
+}
+vars.put("selected_from_fsa", fromFsa)
+vars.put("selected_to_fsa", toFsa)
+</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+        </hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="02 Create Label">
+          <stringProp name="HTTPSampler.domain">${__P(host_mw,localhost)}</stringProp>
+          <stringProp name="HTTPSampler.protocol">${__P(scheme,https)}</stringProp>
+          <stringProp name="HTTPSampler.path">${__P(path_mw_account_prefix)}/${account}${__P(path_mw_label_suffix)}</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#13;
+    "shipment": {&#13;
+        "shipment_level_code": "${service}",&#13;
+        "additional_services_code": ["SR"],&#13;
+        "account_number": "${account}",&#13;
+        "ship_from_name": "Demo Corp",&#13;
+        "ship_from": "Address line 1, line 2",&#13;
+        "ship_to": "To Address line 1",&#13;
+        "ship_from_contact_number": "56967656",&#13;
+        "ship_from_email": "sender@example.com",&#13;
+        "ship_from_province": "ON",&#13;
+        "ship_from_country": "Canada",&#13;
+        "from_fsa": "${selected_from_fsa}",&#13;
+        "ship_to_name": "Deep",&#13;
+        "ship_to_contact_number": "45676556",&#13;
+        "ship_to_email": "recipient@example.com",&#13;
+        "ship_to_province": "ON",&#13;
+        "ship_to_country": "Canada",&#13;
+        "ship_from_city": "Toronto",&#13;
+        "ship_to_city": "Ontario",&#13;
+        "to_fsa": "${selected_to_fsa}",&#13;
+        "carrier_name": "test asl",&#13;
+        "platform": "${__P(platform,DEMO_PLATFORM)}",&#13;
+        "insurance_provider": "Carrier",&#13;
+        "reference": "123453322",&#13;
+        "description": "testing description",&#13;
+        "packages": [&#13;
+            {&#13;
+                "dimension_unit": "inch",&#13;
+                "length": 19.6,&#13;
+                "width": 11,&#13;
+                "height": 10,&#13;
+                "weight": 4,&#13;
+                "weight_unit": "lb",&#13;
+                "insured_value": 1000,&#13;
+                "currency": "CAD"&#13;
+            },&#13;
+            {&#13;
+                "dimension_unit": "inch",&#13;
+                "length": 19.6,&#13;
+                "width": 11,&#13;
+                "height": 10,&#13;
+                "weight": 4,&#13;
+                "weight_unit": "lb",&#13;
+                "insured_value": 1000,&#13;
+                "currency": "CAD"&#13;
+            },&#13;
+            {&#13;
+                "dimension_unit": "inch",&#13;
+                "length": 19.6,&#13;
+                "width": 11,&#13;
+                "height": 10,&#13;
+                "weight": 4,&#13;
+                "weight_unit": "lb",&#13;
+                "insured_value": 1000,&#13;
+                "currency": "CAD"&#13;
+            }&#13;
+        ]&#13;
+    }&#13;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        <stringProp name="HTTPSampler.port">${__P(port,0)}</stringProp></HTTPSamplerProxy>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor">
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="parameters"/>
+            <stringProp name="filename"/>
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="script">// Picks the FSA pair that matches the service level.
+// STD service uses the "standard" FSA list, everything else the SD/ND list.
+// The STD service code comes from the property std_service_code.
+def stdCode = props.getProperty("std_service_code", "STD")
+def service = vars.get("service")
+String fromFsa
+String toFsa
+if (service != null &amp;&amp; service.equalsIgnoreCase(stdCode)) {
+    fromFsa = vars.get("from_std")
+    toFsa   = vars.get("to_std")
+} else {
+    fromFsa = vars.get("from_sdnd")
+    toFsa   = vars.get("to_sdnd")
+}
+vars.put("selected_from_fsa", fromFsa)
+vars.put("selected_to_fsa", toFsa)
+</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+        <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status is 2xx" enabled="true">
+  <collectionProp name="Asserion.test_strings"><stringProp name="1">^2\d\d$</stringProp></collectionProp>
+  <stringProp name="Assertion.custom_message"/>
+  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+  <boolProp name="Assertion.assume_success">false</boolProp>
+  <intProp name="Assertion.test_type">1</intProp>
+</ResponseAssertion><hashTree/></hashTree>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"/>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

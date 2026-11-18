@@ -1,0 +1,415 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="ShipHero Adapter">
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+    <stringProp name="TestPlan.comments">Sanitised performance test plan (no hosts, paths, keys or real data inside).
+
+Everything environment-specific is read through JMeter properties (the __P function):
+  host_customer / host_admin / host_mw, scheme, port, path_*, zpl_api_key, ...
+  threads, rampup, duration, loops, think_time_ms, think_time_range_ms
+Defaults point at the bundled mock API. Real values live in private/config.properties
+(git-ignored). See README.md and config/example.properties.</stringProp></TestPlan>
+    <hashTree>
+      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+        <collectionProp name="HeaderManager.headers"/>
+      </HeaderManager>
+      <hashTree/>
+      <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config-Accounts">
+        <stringProp name="filename">${__P(data_dir,../data/sample)}/shiphero_accounts.csv</stringProp>
+        <stringProp name="fileEncoding"/>
+        <stringProp name="variableNames">account</stringProp>
+        <boolProp name="ignoreFirstLine">true</boolProp>
+        <stringProp name="delimiter">,</stringProp>
+        <boolProp name="quotedData">false</boolProp>
+        <boolProp name="recycle">true</boolProp>
+        <boolProp name="stopThread">false</boolProp>
+        <stringProp name="shareMode">shareMode.all</stringProp>
+      </CSVDataSet>
+      <hashTree/>
+      <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config-SL" enabled="true">
+        <stringProp name="filename">${__P(data_dir,../data/sample)}/services.csv</stringProp>
+        <stringProp name="fileEncoding"/>
+        <stringProp name="variableNames">service</stringProp>
+        <boolProp name="ignoreFirstLine">true</boolProp>
+        <stringProp name="delimiter">,</stringProp>
+        <boolProp name="quotedData">false</boolProp>
+        <boolProp name="recycle">true</boolProp>
+        <boolProp name="stopThread">false</boolProp>
+        <stringProp name="shareMode">shareMode.all</stringProp>
+      </CSVDataSet>
+      <hashTree/>
+      <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config-FSA-SD ND" enabled="true">
+        <stringProp name="filename">${__P(data_dir,../data/sample)}/shiphero_fsa_sdnd.csv</stringProp>
+        <stringProp name="fileEncoding"/>
+        <stringProp name="variableNames">from_sdnd,to_sdnd</stringProp>
+        <boolProp name="ignoreFirstLine">true</boolProp>
+        <stringProp name="delimiter">,</stringProp>
+        <boolProp name="quotedData">false</boolProp>
+        <boolProp name="recycle">true</boolProp>
+        <boolProp name="stopThread">false</boolProp>
+        <stringProp name="shareMode">shareMode.all</stringProp>
+      </CSVDataSet>
+      <hashTree/>
+      <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config-FSA-STD" enabled="true">
+        <stringProp name="filename">${__P(data_dir,../data/sample)}/shiphero_fsa_std.csv</stringProp>
+        <stringProp name="fileEncoding"/>
+        <stringProp name="variableNames">from_std,to_std</stringProp>
+        <boolProp name="ignoreFirstLine">true</boolProp>
+        <stringProp name="delimiter">,</stringProp>
+        <boolProp name="quotedData">false</boolProp>
+        <boolProp name="recycle">true</boolProp>
+        <boolProp name="stopThread">false</boolProp>
+        <stringProp name="shareMode">shareMode.all</stringProp>
+      </CSVDataSet>
+      <hashTree/>
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults (timeouts)" enabled="true">
+  <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables"><collectionProp name="Arguments.arguments"/></elementProp>
+  <stringProp name="HTTPSampler.connect_timeout">${__P(connect_timeout_ms,10000)}</stringProp>
+  <stringProp name="HTTPSampler.response_timeout">${__P(response_timeout_ms,60000)}</stringProp>
+</ConfigTestElement><hashTree/><ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Users">
+        <stringProp name="ThreadGroup.num_threads">${__P(threads,50)}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${__P(rampup,1)}</stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">false</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp><elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">${__P(loops,1)}</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      <stringProp name="ThreadGroup.duration">${__P(duration,3600)}</stringProp><stringProp name="ThreadGroup.delay">0</stringProp></ThreadGroup>
+      <hashTree>
+        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Think Time (think_time_ms + random up to think_time_range_ms)" enabled="true">
+  <stringProp name="ConstantTimer.delay">${__P(think_time_ms,0)}</stringProp>
+  <stringProp name="RandomTimer.range">${__P(think_time_range_ms,0)}</stringProp>
+</UniformRandomTimer><hashTree/><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="01 Generate HMAC Key">
+          <stringProp name="HTTPSampler.domain">${__P(host_mw,localhost)}</stringProp>
+          <stringProp name="HTTPSampler.protocol">${__P(scheme,https)}</stringProp>
+          <stringProp name="HTTPSampler.path">${__P(path_shiphero_key)}?client_id=${account}</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#13;
+  "shipping_method": "${__P(shiphero_shipping_method,Demo Express - Same Day)}",&#13;
+  "order_id": 100000001,&#13;
+  "profile": "default",&#13;
+  "fulfillment_status": "pending",&#13;
+  "order_number": "#DEMO0001",&#13;
+  "shop_name": "${__P(shiphero_shop_name,demo-shop.example.com)}",&#13;
+  "account_id": ${__P(shiphero_account_id,10001)},&#13;
+  "partner_order_id": "900000000001",&#13;
+  "shipping_name": "Standard",&#13;
+  "tax_type": null,&#13;
+  "tax_id": null,&#13;
+  "incoterms": null,&#13;
+  "currency": "CAD",&#13;
+  "order_insurance": false,&#13;
+  "order_insurance_amount": 0,&#13;
+  "from_address": {&#13;
+    "name": "Demo Merchant",&#13;
+    "company_name": "Demo Merchant",&#13;
+    "address_1": "100 Sender Street",&#13;
+    "address_2": "",&#13;
+    "email": "merchant@example.com",&#13;
+    "city": "Vaughan",&#13;
+    "state": "ON",&#13;
+    "zip": "${selected_from_fsa}",&#13;
+    "country": "CA",&#13;
+    "phone": "4165550100"&#13;
+  },&#13;
+  "to_address": {&#13;
+    "name": "Jane Doe",&#13;
+    "company_name": "",&#13;
+    "address_1": "200 Receiver Avenue",&#13;
+    "address_2": "",&#13;
+    "email": "",&#13;
+    "city": "Toronto",&#13;
+    "state": "ON",&#13;
+    "zip": "${selected_to_fsa}",&#13;
+    "country": "CA",&#13;
+    "phone": ""&#13;
+  },&#13;
+  "packages": [&#13;
+    {&#13;
+      "name": "Package 1",&#13;
+      "weight_in_oz": 340,&#13;
+      "width": 12.5,&#13;
+      "length": 12.5,&#13;
+      "height": 12.5,&#13;
+      "line_items": [&#13;
+        {&#13;
+          "sku": "SKU-A-001",&#13;
+          "tariff_code": "00.00.00.000",&#13;
+          "price": 34.56,&#13;
+          "customs_description": "Sample Product A (Discount)",&#13;
+          "customs_value": 34.56,&#13;
+          "line_item_id": 200000001,&#13;
+          "quantity": 1,&#13;
+          "weight": 0,&#13;
+          "partner_line_item_id": "300000001",&#13;
+          "id": "300000001",&#13;
+          "country_of_manufacture": "",&#13;
+          "product_name": "Sample Product A",&#13;
+          "name": "Sample Product A (Discount)",&#13;
+          "ignore_on_customs": false&#13;
+        },&#13;
+        {&#13;
+          "sku": "SKU-B-001",&#13;
+          "tariff_code": "00.00.00.000",&#13;
+          "price": 0,&#13;
+          "customs_description": "Sample Product B",&#13;
+          "customs_value": 38.4,&#13;
+          "line_item_id": 200000002,&#13;
+          "quantity": 1,&#13;
+          "weight": 0,&#13;
+          "partner_line_item_id": "15641714753625-100000001-1",&#13;
+          "id": "15641714753625-100000001-1",&#13;
+          "country_of_manufacture": "US",&#13;
+          "product_name": "Sample Product B",&#13;
+          "name": "Sample Product B",&#13;
+          "ignore_on_customs": false&#13;
+        }&#13;
+      ],&#13;
+      "box_code": "custom",&#13;
+      "box_id": 12179,&#13;
+      "box_name": "RSC 12x12x12"&#13;
+    }&#13;
+  ],&#13;
+  "wholesale_shipping": null,&#13;
+  "adapter": "shiphero",&#13;
+  "service": "${service}",&#13;
+  "client_id": "${account}"&#13;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        <stringProp name="HTTPSampler.port">${__P(port,0)}</stringProp></HTTPSamplerProxy>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor" enabled="true">
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="parameters"/>
+            <stringProp name="filename"/>
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="script">// Picks the FSA pair that matches the service level.
+// STD service uses the "standard" FSA list, everything else the SD/ND list.
+// The STD service code comes from the property std_service_code.
+def stdCode = props.getProperty("std_service_code", "STD")
+def service = vars.get("service")
+String fromFsa
+String toFsa
+if (service != null &amp;&amp; service.equalsIgnoreCase(stdCode)) {
+    fromFsa = vars.get("from_std")
+    toFsa   = vars.get("to_std")
+} else {
+    fromFsa = vars.get("from_sdnd")
+    toFsa   = vars.get("to_sdnd")
+}
+vars.put("selected_from_fsa", fromFsa)
+vars.put("selected_to_fsa", toFsa)
+</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor" enabled="true">
+            <stringProp name="JSONPostProcessor.referenceNames">hmac_key</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.key</stringProp>
+            <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
+        <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status is 2xx" enabled="true">
+  <collectionProp name="Asserion.test_strings"><stringProp name="1">^2\d\d$</stringProp></collectionProp>
+  <stringProp name="Assertion.custom_message"/>
+  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+  <boolProp name="Assertion.assume_success">false</boolProp>
+  <intProp name="Assertion.test_type">1</intProp>
+</ResponseAssertion><hashTree/></hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="02 Create ShipHero Label" enabled="true">
+          <stringProp name="HTTPSampler.domain">${__P(host_mw,localhost)}</stringProp>
+          <stringProp name="HTTPSampler.protocol">${__P(scheme,https)}</stringProp>
+          <stringProp name="HTTPSampler.path">${__P(path_shiphero_label)}?adapter=shiphero&amp;service=${service}&amp;client_id=${account}</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#13;
+  "shipping_method": "${__P(shiphero_shipping_method,Demo Express - Same Day)}",&#13;
+  "order_id": 100000001,&#13;
+  "profile": "default",&#13;
+  "fulfillment_status": "pending",&#13;
+  "order_number": "#DEMO0001",&#13;
+  "shop_name": "${__P(shiphero_shop_name,demo-shop.example.com)}",&#13;
+  "account_id": ${__P(shiphero_account_id,10001)},&#13;
+  "partner_order_id": "900000000001",&#13;
+  "shipping_name": "Standard",&#13;
+  "tax_type": null,&#13;
+  "tax_id": null,&#13;
+  "incoterms": null,&#13;
+  "currency": "CAD",&#13;
+  "order_insurance": false,&#13;
+  "order_insurance_amount": 0,&#13;
+  "from_address": {&#13;
+    "name": "Demo Merchant",&#13;
+    "company_name": "Demo Merchant",&#13;
+    "address_1": "100 Sender Street",&#13;
+    "address_2": "",&#13;
+    "email": "merchant@example.com",&#13;
+    "city": "Vaughan",&#13;
+    "state": "ON",&#13;
+    "zip": "${selected_from_fsa}",&#13;
+    "country": "CA",&#13;
+    "phone": "4165550100"&#13;
+  },&#13;
+  "to_address": {&#13;
+    "name": "Jane Doe",&#13;
+    "company_name": "",&#13;
+    "address_1": "200 Receiver Avenue",&#13;
+    "address_2": "",&#13;
+    "email": "",&#13;
+    "city": "Toronto",&#13;
+    "state": "ON",&#13;
+    "zip": "${selected_to_fsa}",&#13;
+    "country": "CA",&#13;
+    "phone": ""&#13;
+  },&#13;
+  "packages": [&#13;
+    {&#13;
+      "name": "Package 1",&#13;
+      "weight_in_oz": 340,&#13;
+      "width": 12.5,&#13;
+      "length": 12.5,&#13;
+      "height": 12.5,&#13;
+      "line_items": [&#13;
+        {&#13;
+          "sku": "SKU-A-001",&#13;
+          "tariff_code": "00.00.00.000",&#13;
+          "price": 34.56,&#13;
+          "customs_description": "Sample Product A (Discount)",&#13;
+          "customs_value": 34.56,&#13;
+          "line_item_id": 200000001,&#13;
+          "quantity": 1,&#13;
+          "weight": 0,&#13;
+          "partner_line_item_id": "300000001",&#13;
+          "id": "300000001",&#13;
+          "country_of_manufacture": "",&#13;
+          "product_name": "Sample Product A",&#13;
+          "name": "Sample Product A (Discount)",&#13;
+          "ignore_on_customs": false&#13;
+        },&#13;
+        {&#13;
+          "sku": "SKU-B-001",&#13;
+          "tariff_code": "00.00.00.000",&#13;
+          "price": 0,&#13;
+          "customs_description": "Sample Product B",&#13;
+          "customs_value": 38.4,&#13;
+          "line_item_id": 200000002,&#13;
+          "quantity": 1,&#13;
+          "weight": 0,&#13;
+          "partner_line_item_id": "15641714753625-100000001-1",&#13;
+          "id": "15641714753625-100000001-1",&#13;
+          "country_of_manufacture": "US",&#13;
+          "product_name": "Sample Product B",&#13;
+          "name": "Sample Product B",&#13;
+          "ignore_on_customs": false&#13;
+        }&#13;
+      ],&#13;
+      "box_code": "custom",&#13;
+      "box_id": 12179,&#13;
+      "box_name": "RSC 12x12x12"&#13;
+    }&#13;
+  ],&#13;
+  "wholesale_shipping": null,&#13;
+  "adapter": "shiphero",&#13;
+  "service": "${service}",&#13;
+  "client_id": "${account}"&#13;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        <stringProp name="HTTPSampler.port">${__P(port,0)}</stringProp></HTTPSamplerProxy>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Accept</stringProp>
+                <stringProp name="Header.value">*/* </stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Accept-Encoding</stringProp>
+                <stringProp name="Header.value">gzip, deflate, br</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Connection</stringProp>
+                <stringProp name="Header.value">keep-alive</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">x-shiphero-hmac-sha256</stringProp>
+                <stringProp name="Header.value">${hmac_key}</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+        <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status is 2xx" enabled="true">
+  <collectionProp name="Asserion.test_strings"><stringProp name="1">^2\d\d$</stringProp></collectionProp>
+  <stringProp name="Assertion.custom_message"/>
+  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+  <boolProp name="Assertion.assume_success">false</boolProp>
+  <intProp name="Assertion.test_type">1</intProp>
+</ResponseAssertion><hashTree/></hashTree>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"/>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
